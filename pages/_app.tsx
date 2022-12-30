@@ -4,6 +4,7 @@ import { SWRConfig } from "swr";
 import { lightTheme } from "../themes/";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { CartProvider, UIProvider } from "../context";
+import { AuthProvider } from "../context/auth";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
@@ -14,12 +15,14 @@ export default function App({ Component, pageProps }: AppProps) {
       }}
     >
       <UIProvider>
-        <CartProvider>
-          <ThemeProvider theme={lightTheme}>
-            <CssBaseline />
-            <Component {...pageProps} />
-          </ThemeProvider>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <ThemeProvider theme={lightTheme}>
+              <CssBaseline />
+              <Component {...pageProps} />
+            </ThemeProvider>
+          </CartProvider>
+        </AuthProvider>
       </UIProvider>
     </SWRConfig>
   );

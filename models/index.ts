@@ -1,3 +1,3 @@
 export { default as Product } from "./Product";
 
-export { default as User } from "./user.model";
+export { default as User } from "./User.model";

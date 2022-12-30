@@ -1,9 +1,24 @@
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { ShopLayout } from "../../components/layouts";
 import { Button, Card, Grid, Typography } from "@mui/material";
 
 import { CartList, OrderSummary } from "../../components/cart";
+import { useCartContext } from "../../context/cart/";
 
 const Cart = () => {
+  const { cart, isLoaded } = useCartContext();
+  const router = useRouter();
+  useEffect(() => {
+    if (isLoaded && cart.length === 0) {
+      router.replace("/cart/empty");
+    }
+  }, [cart, isLoaded, router]);
+
+  if (!isLoaded || cart.length === 0) {
+    return <></>;
+  }
+
   return (
     <ShopLayout title="Cart" description="Cart page">
       <Typography variant="h4" component="h1" gutterBottom>
@@ -23,6 +38,7 @@ const Cart = () => {
           <Button
             variant="contained"
             fullWidth
+            href="/checkout/address"
             sx={{
               mt: 2,
             }}
