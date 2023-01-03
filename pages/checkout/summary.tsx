@@ -1,28 +1,57 @@
-import React from "react";
+import React, { useState } from "react";
 import { ShopLayout } from "../../components/layouts/ShopLayout";
-import { Button, Card, Divider, Grid, Stack, Typography } from "@mui/material";
+import {
+  Button,
+  Card,
+  Divider,
+  Grid,
+  Stack,
+  Typography,
+  Chip,
+} from "@mui/material";
 import { CartList, OrderSummary } from "../../components/cart";
 import Link from "next/link";
 import { useCartContext } from "../../context/cart/CartContext";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+import Cookies from "js-cookie";
+import { ShippingAdress } from "../../components/order/ShippingAdress";
 
 const SummaryPage = () => {
-  const { shippingAddress, numberOfItmes } = useCartContext();
+  const { shippingAddress, numberOfItmes, createOrder } = useCartContext();
+  const router = useRouter();
+  const [isPosting, setIsPosting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  useEffect(() => {
+    if (!Cookies.get("name")) {
+      router.push("/checkout/address");
+    }
+  }, [router]);
 
   if (!shippingAddress) {
     return <></>;
   }
 
-  const {
-    name,
-    lastName,
-    address1,
-    address2,
-    city,
-    postalCode,
-    country,
-    department,
-    phone,
-  } = shippingAddress;
+  const handleCreateOrder = async () => {
+    setIsPosting(true);
+    const { hasError, message, _id } = await createOrder();
+    if (hasError) {
+      setIsPosting(false);
+      setErrorMessage(message);
+
+      setTimeout(() => {
+        setErrorMessage("");
+      }, 3000);
+      return;
+    }
+
+    setIsPosting(false);
+    setErrorMessage("");
+    if (_id) {
+      router.push(`/orders/${_id}`);
+    }
+  };
+
   return (
     <ShopLayout
       title="Resumen de compra"
@@ -70,31 +99,7 @@ const SummaryPage = () => {
                 </Typography>
               </Link>
             </Stack>
-            <Typography color={"text.secondary"} variant="body1">
-              {name + " " + lastName}
-            </Typography>
-            <Typography color={"text.secondary"} variant="body1">
-              {address1}
-            </Typography>
-
-            {address2 && (
-              <Typography color={"text.secondary"} variant="body1">
-                {address2}
-              </Typography>
-            )}
-
-            <Typography color={"text.secondary"} variant="body1">
-              {city + ", " + department + ", " + postalCode}
-            </Typography>
-
-            <Typography color={"text.secondary"} variant="body1">
-              {country}
-            </Typography>
-
-            <Typography color={"text.secondary"} variant="body1">
-              {phone}
-            </Typography>
-
+            <ShippingAdress shippingAddress={shippingAddress} />
             <Divider
               sx={{
                 my: 2,
@@ -116,36 +121,26 @@ const SummaryPage = () => {
               </Link>
             </Stack>
             <OrderSummary />
-            <Divider
-              sx={{
-                my: 2,
-              }}
-            />
-
-            <Stack
-              spacing={2}
-              alignItems={"center"}
-              justifyContent={"space-between"}
-              direction={"row"}
-            >
-              <Typography variant="subtitle1" lineHeight={2}>
-                Total
-              </Typography>
-              <Typography
-                lineHeight={2}
-                color={"secondary.main"}
-                variant="subtitle1"
-              >
-                $110
-              </Typography>
-            </Stack>
+            {errorMessage && (
+              <Chip
+                label={errorMessage}
+                color="error"
+                className="fadeIn"
+                sx={{
+                  mt: 2,
+                  width: "100%",
+                }}
+              />
+            )}
           </Card>
           <Button
             variant="contained"
+            onClick={handleCreateOrder}
             fullWidth
             sx={{
               mt: 2,
             }}
+            disabled={isPosting}
           >
             Comprar
           </Button>

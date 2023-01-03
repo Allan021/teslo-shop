@@ -1,13 +1,22 @@
+import { useRouter } from "next/router";
+import { signIn, getSession } from "next-auth/react";
 import React, { useMemo, useState } from "react";
-import { Button, Chip, Paper, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  Chip,
+  Divider,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Box, Stack } from "@mui/system";
 import Image from "next/image";
 import Link from "next/link";
 import { AuthLayout } from "../../components/layouts";
 import { useForm } from "react-hook-form";
 import { validations } from "../../utils";
-import { useAuthContext } from "../../context/auth/AuthContext";
-import { useRouter } from "next/router";
+import { GetServerSideProps } from "next";
+import { useProviders } from "../../hooks";
 type FormFields = {
   email: string;
   password: string;
@@ -20,7 +29,6 @@ const LoginPage = () => {
   } = useForm<FormFields>();
   const [showMessage, setShowMessage] = useState(false);
   const router = useRouter();
-  const { loginUser } = useAuthContext();
 
   const redirectTo = useMemo(() => {
     const redirect_to = router.query.redirect_to as string;
@@ -28,20 +36,15 @@ const LoginPage = () => {
     return url;
   }, [router.query.redirect_to]);
 
+  const providers = useProviders();
+
   const onSubmit = async ({ email, password }: FormFields) => {
     setShowMessage(false);
 
-    const isValidLogin = await loginUser(email, password);
-    if (!isValidLogin) {
-      setShowMessage(true);
-
-      setTimeout(() => {
-        setShowMessage(false);
-      }, 3000);
-      return;
-    }
-
-    router.push(redirectTo);
+    await signIn("credentials", {
+      email,
+      password,
+    });
   };
   return (
     <AuthLayout title="Login Page">
@@ -138,10 +141,58 @@ const LoginPage = () => {
           >
             Iniciar Sesión
           </Button>
+
+          {providers && (
+            <Box sx={{ mt: 2 }}>
+              <Divider sx={{ my: 2, width: "90%" }} />
+
+              <Typography variant="body2" sx={{ textAlign: "center" }}>
+                O inicia sesión con
+              </Typography>
+
+              <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+                {Object.values(providers).map((provider) => {
+                  if (provider.type !== "oauth") {
+                    return <div key={provider.name} />;
+                  }
+
+                  return (
+                    <Button
+                      key={provider.name}
+                      variant="contained"
+                      onClick={() => signIn(provider.id)}
+                      fullWidth
+                    >
+                      {provider.name}
+                    </Button>
+                  );
+                })}
+              </Stack>
+            </Box>
+          )}
         </form>
       </Paper>
     </AuthLayout>
   );
 };
 
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  query,
+}) => {
+  const { redirect_to = "/" } = query;
+  const session = await getSession({ req });
+  if (session) {
+    return {
+      redirect: {
+        destination: redirect_to as string,
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+};
 export default LoginPage;

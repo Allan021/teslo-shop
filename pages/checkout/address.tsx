@@ -41,6 +41,7 @@ const getAddressFromCookies = (): FormData => {
   };
 };
 
+console.log(getAddressFromCookies().country);
 const AddressPage = () => {
   const {
     register,

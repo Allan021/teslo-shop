@@ -30,7 +30,7 @@ export const CartItem: FC<CartItemProps> = ({ product, editable }) => {
   };
 
   return (
-    <Grid container key={product.slug} spacing={3} marginBottom={2}>
+    <Grid container spacing={3} marginBottom={2}>
       <Grid item xs={3}>
         <NavLink href={`/product/${product.slug}`} passHref>
           <CardActionArea

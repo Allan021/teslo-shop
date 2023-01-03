@@ -1,7 +1,10 @@
-import { useReducer, useEffect } from "react";
-import { ICartProduct } from "../../interfaces";
-import { CartContext, cartReducer } from ".";
+import { useReducer, useEffect, useState } from "react";
+import { ICartProduct, ShippingAddress } from "../../interfaces";
+import { CartContext, cartReducer, CartResponse } from ".";
 import Cookies from "js-cookie";
+import { orderService } from "../../services";
+import { IOrder } from "../../interfaces/order";
+import { isAxiosError } from "axios";
 
 export interface CartState {
   isLoaded: boolean;
@@ -11,18 +14,6 @@ export interface CartState {
   tax: number;
   total: number;
   shippingAddress?: ShippingAddress;
-}
-
-export interface ShippingAddress {
-  name: string;
-  lastName: string;
-  phone: string;
-  address1: string;
-  address2?: string;
-  department: string;
-  city: string;
-  postalCode: string;
-  country: string;
 }
 
 const Cart_INITIAL_STATE: CartState = {
@@ -37,6 +28,9 @@ const Cart_INITIAL_STATE: CartState = {
 
 export const CartProvider = ({ children }: any) => {
   const [state, dispatch] = useReducer(cartReducer, Cart_INITIAL_STATE);
+
+  const [cartItemsAreLoader, setCartItemsAreLoader] = useState(false);
+
   useEffect(() => {
     try {
       const cookieProducts = Cookies.get("cart")
@@ -46,12 +40,15 @@ export const CartProvider = ({ children }: any) => {
         type: "[Cart] - LoadCart from cookies | storage",
         payload: cookieProducts,
       });
+
+      setCartItemsAreLoader(true);
     } catch (error) {
       console.log(error);
       dispatch({
         type: "[Cart] - LoadCart from cookies | storage",
         payload: [],
       });
+      setCartItemsAreLoader(true);
     }
   }, []);
 
@@ -77,12 +74,10 @@ export const CartProvider = ({ children }: any) => {
   }, []);
 
   useEffect(() => {
-    if (state.cart.length === 0) {
-      return;
-    }
+    if (!cartItemsAreLoader) return;
 
     Cookies.set("cart", JSON.stringify(state.cart));
-  }, [state.cart]);
+  }, [cartItemsAreLoader, state.cart]);
 
   useEffect(() => {
     const numberOfItmes = state.cart.reduce(
@@ -161,6 +156,55 @@ export const CartProvider = ({ children }: any) => {
     });
   };
 
+  const createOrder = async (): Promise<CartResponse> => {
+    if (!state.shippingAddress) {
+      throw new Error("No hay una dirección de envío");
+    }
+
+    const body: IOrder = {
+      shippingAddress: state.shippingAddress,
+      number0fItems: state.numberOfItmes,
+      subTotal: state.subTotal,
+      tax: state.tax,
+      total: state.total,
+      isPaid: false,
+      orderItems: state.cart.map((product) => ({
+        ...product,
+        size: product.size!,
+      })),
+    };
+
+    try {
+      const order = await orderService.createOrder(body);
+
+      dispatch({
+        type: "[Cart] - Clear Cart",
+      });
+
+      return {
+        hasError: false,
+        _id: order._id,
+        message: "Orden creada correctamente",
+      };
+    } catch (error) {
+      if (isAxiosError(error)) {
+        return {
+          hasError: true,
+          message: error.response?.data.message || "Error al crear la orden",
+        };
+      }
+      return {
+        hasError: true,
+        message: "Error al crear la orden, intente más tarde",
+      };
+    }
+  };
+
+  const clearCart = () => {
+    dispatch({
+      type: "[Cart] - Clear Cart",
+    });
+  };
   return (
     <CartContext.Provider
       value={{
@@ -169,6 +213,8 @@ export const CartProvider = ({ children }: any) => {
         addProduct: addProductToCart,
         updateCartQuantity,
         deleteProduct,
+        createOrder,
+        clearCart,
       }}
     >
       {children}

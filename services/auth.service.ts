@@ -2,7 +2,7 @@ import { tesloApi } from "../api/";
 
 export const login = async (email: string, password: string) => {
   try {
-    const response = await tesloApi.post("/auth/login", {
+    const response = await tesloApi.post("/user/login", {
       email,
       password,
     });
@@ -19,7 +19,7 @@ interface IRegister {
 }
 export const register = async ({ email, password, name }: IRegister) => {
   try {
-    const response = await tesloApi.post("/auth/register", {
+    const response = await tesloApi.post("/user/register", {
       email,
       password,
       name,
@@ -32,7 +32,7 @@ export const register = async ({ email, password, name }: IRegister) => {
 
 export const validateToken = async () => {
   try {
-    const response = await tesloApi.post("/auth/verify-token");
+    const response = await tesloApi.post("/user/verify-token");
     return response;
   } catch (error) {
     throw error;

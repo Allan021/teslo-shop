@@ -1,14 +1,23 @@
+import { useRouter } from "next/router";
+import { signIn, getSession } from "next-auth/react";
+import { GetServerSideProps } from "next";
 import { useMemo, useState } from "react";
-import React from "react";
-import { useForm } from "react-hook-form";
 import Link from "next/link";
 import Image from "next/image";
-import { Button, Chip, Paper, TextField, Typography } from "@mui/material";
+import { useForm } from "react-hook-form";
+import {
+  Button,
+  Chip,
+  Divider,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Box, Stack } from "@mui/system";
 import { AuthLayout } from "../../components/layouts";
 import { validations } from "../../utils";
 import { useAuthContext } from "../../context/auth/AuthContext";
-import { useRouter } from "next/router";
+import { useProviders } from "../../hooks";
 type FormFields = {
   email: string;
   password: string;
@@ -23,6 +32,7 @@ const RegisterPage = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { registerUser } = useAuthContext();
   const router = useRouter();
+  const providers = useProviders();
 
   const redirectTo = useMemo(() => {
     const redirect_to = router.query.redirect_to as string;
@@ -34,14 +44,14 @@ const RegisterPage = () => {
     const { hasError, message } = await registerUser(data);
 
     if (hasError) {
-      setErrorMessage(message || "");
-      setTimeout(() => {
-        setErrorMessage(null);
-      }, 3000);
+      setErrorMessage(message || "Error al registrar el usuario");
       return;
     }
 
-    router.push(redirectTo);
+    await signIn("credentials", {
+      email: data.email,
+      password: data.password,
+    });
   };
   return (
     <AuthLayout title="Register Page">
@@ -159,10 +169,57 @@ const RegisterPage = () => {
           >
             Iniciar Sesión
           </Button>
+
+          {providers && (
+            <Box sx={{ mt: 2 }}>
+              <Divider sx={{ my: 2, width: "90%" }} />
+
+              <Typography variant="body2" sx={{ textAlign: "center" }}>
+                O Registrate con
+              </Typography>
+
+              <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
+                {Object.values(providers).map((provider) => {
+                  if (provider.type !== "oauth") {
+                    return <div key={provider.name} />;
+                  }
+
+                  return (
+                    <Button
+                      key={provider.name}
+                      variant="contained"
+                      onClick={() => signIn(provider.id)}
+                      fullWidth
+                    >
+                      {provider.name}
+                    </Button>
+                  );
+                })}
+              </Stack>
+            </Box>
+          )}
         </form>
       </Paper>
     </AuthLayout>
   );
 };
+export const getServerSideProps: GetServerSideProps = async ({
+  req,
+  query,
+}) => {
+  const { redirect_to = "/" } = query;
+  const session = await getSession({ req });
+  if (session) {
+    return {
+      redirect: {
+        destination: redirect_to as string,
+        permanent: false,
+      },
+    };
+  }
 
+  return {
+    props: {},
+  };
+};
 export default RegisterPage;

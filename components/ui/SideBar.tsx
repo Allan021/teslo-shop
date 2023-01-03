@@ -73,20 +73,22 @@ export const SideBar = () => {
             />
           </ListItem>
           {isLoggedIn && (
-            <ListItemButton onClick={() => navigateTo("/profile")}>
-              <ListItemIcon>
-                <AccountCircleOutlined />
-              </ListItemIcon>
-              <ListItemText primary={"Perfil"} />
-            </ListItemButton>
-          )}
+            <>
+              <ListItemButton onClick={() => navigateTo("/profile")}>
+                <ListItemIcon>
+                  <AccountCircleOutlined />
+                </ListItemIcon>
+                <ListItemText primary={"Perfil"} />
+              </ListItemButton>
 
-          <ListItemButton onClick={() => navigateTo("/orders/history")}>
-            <ListItemIcon>
-              <ConfirmationNumberOutlined />
-            </ListItemIcon>
-            <ListItemText primary={"Mis Ordenes"} />
-          </ListItemButton>
+              <ListItemButton onClick={() => navigateTo("/orders/history")}>
+                <ListItemIcon>
+                  <ConfirmationNumberOutlined />
+                </ListItemIcon>
+                <ListItemText primary={"Mis Ordenes"} />
+              </ListItemButton>
+            </>
+          )}
 
           <ListItemButton
             onClick={() => navigateTo("/categories/man")}
