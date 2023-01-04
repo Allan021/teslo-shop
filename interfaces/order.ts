@@ -36,3 +36,15 @@ export interface ShippingAddress {
   postalCode: string;
   country: string;
 }
+
+
+export interface OrderPayload {
+  transactionID: string,
+  orderID: string
+}
+
+export interface OrderResponse {
+  data: {
+    message: string
+  }
+}

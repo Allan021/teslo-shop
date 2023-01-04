@@ -6,9 +6,14 @@ import { lightTheme } from "../themes/";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import { CartProvider, UIProvider } from "../context";
 import { AuthProvider } from "../context/auth";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+const initialOptions = {
+  "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "",
+};
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
+    <PayPalScriptProvider options={initialOptions}>
     <SessionProvider>
       <SWRConfig
         value={{
@@ -28,5 +33,6 @@ export default function App({ Component, pageProps }: AppProps) {
         </UIProvider>
       </SWRConfig>
     </SessionProvider>
+    </PayPalScriptProvider>
   );
 }
