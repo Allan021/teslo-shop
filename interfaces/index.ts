@@ -1,5 +1,6 @@
-export * from "./cart";
-export * from "./order";
-export * from "./product";
-export * from "./user";
-export * as Paypal from "./paypal";
+export * from './cart';
+export * from './dashboard';
+export * from './order';
+export * as Paypal from './paypal';
+export * from './product';
+export * from './user';

@@ -6,3 +6,7 @@ export const format = (value: number, locale: string = "en-US") => {
     minimumFractionDigits: 2,
   }).format(value);
 };
+
+export const formatDateToSql = (date: Date) => {
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+}

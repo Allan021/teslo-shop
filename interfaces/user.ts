@@ -5,6 +5,7 @@ export interface IUser {
   role: Role;
   createdAt?: String;
   updatedAt?: String;
+  _id?: string;
 }
 
 export type Role = "client" | "admin" | "seller";
