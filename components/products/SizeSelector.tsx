@@ -16,6 +16,7 @@ export const SizeSelector: FC<SizeSelectorProps> = ({
     return (
         <Stack
             direction={'row'}
+            flexWrap={'wrap'}
             spacing={1}
         >
             {sizes.map((size) => (
