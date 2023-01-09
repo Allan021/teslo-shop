@@ -8,12 +8,14 @@ import {
   Box,
   Button,
 } from "@mui/material";
-import Cookies from "js-cookie";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { ShopLayout } from "../../components/layouts";
 import { countries } from "../../database/countries";
 import { useCartContext } from "../../context/cart/CartContext";
+import { GetServerSideProps,  } from "next";
+import { FC } from "react";
+import Cookies from "js-cookie";
 
 type FormData = {
   name: string;
@@ -27,28 +29,18 @@ type FormData = {
   country: string;
 };
 
-const getAddressFromCookies = (): FormData => {
-  return {
-    name: Cookies.get("name") || "",
-    lastName: Cookies.get("lastName") || "",
-    address1: Cookies.get("address1") || "",
-    address2: Cookies.get("address2") || "",
-    postalCode: Cookies.get("postalCode") || "",
-    city: Cookies.get("city") || "",
-    country: Cookies.get("country") || "",
-    phone: Cookies.get("phone") || "",
-    department: Cookies.get("department") || "",
-  };
-};
 
-console.log(getAddressFromCookies().country);
-const AddressPage = () => {
+interface AddressPageProps{
+  address: FormData
+}
+
+const AddressPage:FC<AddressPageProps> = ({address}) => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormData>({
-    defaultValues: getAddressFromCookies(),
+    defaultValues: address
   });
 
   const router = useRouter();
@@ -176,7 +168,7 @@ const AddressPage = () => {
                   {...register("country", { required: "El país es requerido" })}
                   error={!!errors.country}
                   helperText={errors.country?.message}
-                  defaultValue={getAddressFromCookies().country}
+                  defaultValue={address.country}
                 >
                   {countries.map((country) => (
                     <MenuItem key={country.code} value={country.code}>
@@ -212,5 +204,29 @@ const AddressPage = () => {
     </ShopLayout>
   );
 };
+
+
+export const getServerSideProps: GetServerSideProps = async ({req}) => {
+
+  const address:FormData = {
+    name: req.cookies.name || "",
+    lastName: req.cookies.lastName || "",
+    phone: req.cookies.phone || "",
+    address1: req.cookies.address1 || "",
+    address2: req.cookies.address2 || "",
+    department: req.cookies.department || "",
+    city: req.cookies.city || "",
+    postalCode: req.cookies.postalCode || "",
+    country: req.cookies.country || "",
+  };
+
+
+  return {
+    props:{
+      address
+    }
+  }
+
+}
 
 export default AddressPage;

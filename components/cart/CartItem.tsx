@@ -16,7 +16,7 @@ interface CartItemProps {
   editable?: boolean;
 }
 export const CartItem: FC<CartItemProps> = ({ product, editable }) => {
-  const url = `/products/${product.image}`;
+ 
   const { updateCartQuantity, deleteProduct } = useCartContext();
   const updateProductQuantity = (value: number) => {
     const newProduct = { ...product, quantity: value };
@@ -32,7 +32,7 @@ export const CartItem: FC<CartItemProps> = ({ product, editable }) => {
   return (
     <Grid container spacing={3} marginBottom={2}>
       <Grid item xs={3}>
-        <NavLink href={`/product/${product.slug}`} passHref>
+        <NavLink href={`${product.slug}`} passHref>
           <CardActionArea
             sx={{
               borderRadius: 5,
@@ -40,7 +40,7 @@ export const CartItem: FC<CartItemProps> = ({ product, editable }) => {
           >
             <CardMedia
               component="img"
-              image={url}
+              image={product.image}
               alt={product.title}
               sx={{
                 borderRadius: 5,

@@ -15,12 +15,10 @@ export const ProductSlidesShow: FC<ProductSlidesShowProps> = ({ images }) => {
         >
             {images.map((image, index) => {
 
-                const url = `/products/${image}`
-
                 return (
                     <div className={styles['each-slide']} key={index}>
                         <div style={{
-                            backgroundImage: `url(${url})`,
+                            backgroundImage: `url(${image})`,
                             backgroundSize: 'cover',
                         }}>
                         </div>

@@ -26,7 +26,7 @@ const Cart = () => {
       </Typography>
       <Grid container padding={2} spacing={4}>
         <Grid item xs={12} sm={7}>
-          <CartList />
+          <CartList editable/>
         </Grid>
         <Grid item xs={12} sm={5}>
           <Card sx={{ padding: 4 }}>

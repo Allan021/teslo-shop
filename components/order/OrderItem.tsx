@@ -14,7 +14,7 @@ interface CartItemProps {
 }
 export const OrderItem: FC<CartItemProps> = ({ orderItem }) => {
   const { slug, size, _id, title, price, quantity, image } = orderItem;
-  const url = `/products/${image}`;
+  const url = `${image}`;
 
   return (
     <Grid container spacing={3} marginBottom={2}>
