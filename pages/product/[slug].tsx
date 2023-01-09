@@ -54,6 +54,8 @@ const ProductPage: NextPage<Props> = ({ product }) => {
 
     return (
         <ShopLayout title={`${product.title.slice(0, 25)}`} description={`${product.description}`}
+             image={product.images[0]}
+        
         >
             <Grid container spacing={2}
                 sx={{

@@ -8,7 +8,9 @@ export default function Home() {
   const { products, isLoading } = useProducts("/products");
 
   return (
-    <ShopLayout title="Teslo | Shop" description="Home page of Teslo shop">
+    <ShopLayout title="Teslo | Shop" description="Home page of Teslo shop"
+      image="/teslo.svg"
+    >
       <Typography variant="h1">Teslo</Typography>
 
       <Typography variant="h2" marginBottom={4}>
