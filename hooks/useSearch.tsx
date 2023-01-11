@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import { ChangeEvent, useEffect, useState } from "react"
 import { useUiContext } from '../context/ui/UIContext';
 
-export const useSearch = () => {
+export const useSearch = (toogle=true) => {
     const { toggleMenu, setSearch, search } = useUiContext()
     const { push } = useRouter()
     const [searchTerm, setSearchTerm] = useState<string>('')
@@ -22,9 +22,7 @@ export const useSearch = () => {
     }, [search])
 
 
-    const onSearch = (
-        toogle: boolean = true
-    ) => {
+    const onSearch = () => {
         if (searchTerm.length === 0) return
         push(`/search/${searchTerm}`)
         setSearch(searchTerm)

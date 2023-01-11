@@ -24,10 +24,11 @@ export const AuthProvider = ({ children }: any) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "authenticated") {
-      dispatch({ type: "[Auth] - Login", payload: data.user as IUser });
+    if ( status === 'authenticated' ) {
+      dispatch({ type: '[Auth] - Login', payload: data?.user as IUser })
     }
-  }, [data, status]);
+  
+  }, [ status, data ])
 
   const loginUser = async (
     email: string,
@@ -44,7 +45,6 @@ export const AuthProvider = ({ children }: any) => {
   };
 
   const logout = () => {
-    Cookies.remove("token");
     Cookies.remove("name");
     Cookies.remove("lastName");
     Cookies.remove("phone");
@@ -54,8 +54,8 @@ export const AuthProvider = ({ children }: any) => {
     Cookies.remove("city");
     Cookies.remove("postalCode");
     Cookies.remove("country");
+    Cookies.remove('cart');
     signOut();
-    router.reload();
   };
 
   // const checkUserLoggedIn = async () => {

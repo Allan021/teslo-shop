@@ -51,7 +51,7 @@ export const Navbar = () => {
 
     searchTerm,
     showInput,
-  } = useSearch();
+  } = useSearch(false);
   const { toggleMenu } = useUiContext();
   const { numberOfItmes } = useCartContext();
   return (
