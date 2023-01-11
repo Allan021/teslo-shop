@@ -9,7 +9,7 @@ export default function Home() {
 
   return (
     <ShopLayout title="Teslo | Shop" description="Home page of Teslo shop"
-      image="/teslo.svg"
+      image="https://teslochipiado.herokuapp.com/teslo.svg"
     >
       <Typography variant="h1">Teslo</Typography>
 
