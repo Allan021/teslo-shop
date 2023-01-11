@@ -3,7 +3,7 @@ export const lightTheme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#1E1E1E",
+      main: "#5049e4",
     },
     secondary: {
       main: "#3A64D8",
